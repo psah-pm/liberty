@@ -31,7 +31,7 @@
 # ENTRYPOINT ["/opt/jboss/container/java/run/run-java.sh", "--server.port=8081"]
 
 # Base Image
-FROM openliberty/open-liberty:23.0.0.11-full-java11
+FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 
 # Set the working directory
 WORKDIR /app
