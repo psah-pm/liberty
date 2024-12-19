@@ -36,8 +36,8 @@ FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 # Set the working directory
 WORKDIR /app
 
-# Copy the WAR file to the dropins directory
-COPY target/demo-0.0.1-SNAPSHOT.war /config/dropins/
+# Copy the WAR file from the build context to the dropins directory
+COPY --chown=1001:0 target/demo-0.0.1-SNAPSHOT.war /config/dropins/
 
 # Copy the Liberty configuration file
 COPY src/main/liberty/config/server.xml /config/server.xml
@@ -47,4 +47,5 @@ EXPOSE 8081
 
 # Run the application using Liberty's server
 CMD ["server", "run", "defaultServer"]
+
 
