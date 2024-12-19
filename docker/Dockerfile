@@ -30,22 +30,38 @@
 # EXPOSE 8081
 # ENTRYPOINT ["/opt/jboss/container/java/run/run-java.sh", "--server.port=8081"]
 
-# Base Image
+# Stage 1: Build Phase
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.15-1.1682053058 AS builder
+
+# Set the working directory for the build
+WORKDIR /home/jboss/project
+
+# Copy the Maven build configuration
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline
+
+# Copy the application source code
+COPY src src
+
+# Build the WAR file
+RUN mvn package -Dmaven.test.skip=true
+
+# Stage 2: Deployment Phase
 FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 
-# Set the working directory
-WORKDIR /app
+# Copy the WAR file from the builder phase to the Liberty dropins directory
+COPY --from=builder /home/jboss/project/target/*.war /config/dropins/
 
-# Copy the WAR file from the build context to the dropins directory
-COPY --chown=1001:0 target/demo-0.0.1-SNAPSHOT.war /config/dropins/
-
-# Copy the Liberty configuration file
+# Copy the Liberty server configuration
 COPY src/main/liberty/config/server.xml /config/server.xml
 
-# Expose the port the application will run on
+# Expose the application port
 EXPOSE 8081
 
-# Run the application using Liberty's server
-CMD ["server", "run", "defaultServer"]
+# Start the Liberty server
+CMD ["defaultServer"]
+
 
 
