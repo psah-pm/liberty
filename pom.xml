@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>io.openliberty</groupId>
 			<artifactId>openliberty-runtime</artifactId>
-			<version>24.0.0.12-kernel-slim-java21-openj9-ubi-minimal</version> <!-- Use the latest version -->
+			<version>24.0.0.12</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
