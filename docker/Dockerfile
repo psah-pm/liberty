@@ -36,7 +36,7 @@ FROM openliberty/open-liberty:23.0.0.11-full-java11
 # Set the working directory
 WORKDIR /app
 
-# Copy the WAR file to the working directory
+# Copy the WAR file to the dropins directory
 COPY target/demo-0.0.1-SNAPSHOT.war /config/dropins/
 
 # Copy the Liberty configuration file
@@ -47,3 +47,4 @@ EXPOSE 8081
 
 # Run the application using Liberty's server
 CMD ["server", "run", "defaultServer"]
+
