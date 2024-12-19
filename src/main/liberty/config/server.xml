@@ -1,0 +1,10 @@
+<server description="Spring Boot Sample Server">
+    <!-- Enable the web profile -->
+    <featureManager>
+        <feature>servlet</feature>
+        <feature>springBoot-3.0</feature>
+    </featureManager>
+
+    <!-- Application -->
+    <application id="spring-app" location="spring-app.war" type="war"/>
+</server>
