@@ -49,6 +49,9 @@ RUN mvn package -Dmaven.test.skip=true
 # Stage 2: Deployment Phase
 FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 
+# Add the Maven Central repository explicitly
+RUN sed -i 's|https://repo1.maven.org/maven2/|https://repo1.maven.org/maven2/|g' /opt/ol/wlp/user/servers/defaultServer/server.xml
+
 # Copy the WAR file to the Liberty dropins directory
 COPY --from=builder /home/jboss/project/target/*.war /config/dropins/
 
@@ -60,5 +63,6 @@ EXPOSE 8081
 
 # Start the Liberty server
 CMD ["defaultServer"]
+
 
 
