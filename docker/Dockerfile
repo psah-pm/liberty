@@ -40,7 +40,7 @@ WORKDIR /home/jboss/project
 COPY pom.xml .
 
 # Download dependencies
-RUN mvn dependency:go-offline
+RUN mvn dependency:go-offline -X
 
 # Copy the application source code
 COPY src src
