@@ -33,14 +33,12 @@
 # Stage 1: Build Phase
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.15-1.1682053058 AS builder
 
-# Set the working directory for the build
+# Set the working directory
 WORKDIR /home/jboss/project
 
-# Copy the Maven build configuration
+# Copy the Maven configuration to download dependencies
 COPY pom.xml .
-
-# Download dependencies
-RUN mvn dependency:go-offline -X
+RUN mvn dependency:resolve dependency:resolve-plugins
 
 # Copy the application source code
 COPY src src
@@ -51,10 +49,10 @@ RUN mvn package -Dmaven.test.skip=true
 # Stage 2: Deployment Phase
 FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 
-# Copy the WAR file from the builder phase to the Liberty dropins directory
+# Copy the WAR file to the Liberty dropins directory
 COPY --from=builder /home/jboss/project/target/*.war /config/dropins/
 
-# Copy the Liberty server configuration
+# Copy Liberty server configuration
 COPY src/main/liberty/config/server.xml /config/server.xml
 
 # Expose the application port
@@ -62,6 +60,5 @@ EXPOSE 8081
 
 # Start the Liberty server
 CMD ["defaultServer"]
-
 
 
