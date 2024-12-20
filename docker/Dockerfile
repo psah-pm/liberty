@@ -36,24 +36,30 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.15-1.1682053058 AS builder
 # Set the working directory
 WORKDIR /home/jboss/project
 
-# Copy the Maven configuration to download dependencies
-COPY pom.xml .
-RUN mvn dependency:resolve dependency:resolve-plugins
+# Copy the Gradle configuration
+COPY gradle.properties .
+COPY gradlew .
+COPY gradlew.bat .
+
+# Download dependencies
+RUN ./gradlew dependencies --info
 
 # Copy the application source code
 COPY src src
 
 # Build the WAR file
-RUN mvn package -Dmaven.test.skip=true
+RUN ./gradlew bootWar -x test
 
 # Stage 2: Deployment Phase
 FROM openliberty/open-liberty:24.0.0.12-kernel-slim-java21-openj9-ubi-minimal
 
-# Add the Maven Central repository explicitly
-RUN sed -i 's|https://repo1.maven.org/maven2/|https://repo1.maven.org/maven2/|g' /opt/ol/wlp/user/servers/defaultServer/server.xml
+# Install Open Liberty runtime if not already present
+RUN if [ ! -d "/opt/ol" ]; then \
+        curl -L https://repo1.maven.org/maven2/io/openliberty/openliberty-runtime/24.0.0.12/openliberty-runtime-24.0.0.12.jar -o /opt/ol/openliberty-runtime.jar; \
+        fi
 
 # Copy the WAR file to the Liberty dropins directory
-COPY --from=builder /home/jboss/project/target/*.war /config/dropins/
+COPY --from=builder /home/jboss/project/build/libs/*.war /config/dropins/
 
 # Copy Liberty server configuration
 COPY src/main/liberty/config/server.xml /config/server.xml
@@ -63,6 +69,3 @@ EXPOSE 8081
 
 # Start the Liberty server
 CMD ["defaultServer"]
-
-
-
